@@ -1,13 +1,14 @@
 <template>
   <div class="about">
-    <h1>{{ nome }}, hoje é Terça-Feira!</h1>
+    <h1>Bem-vindo, {{ nome }}!</h1>
     <p><input type="text" v-model="nome"/></p>
-    <p v-if="nome.length > 5">Texto longo!</p>
+    <p v-if="nome.length > 6">Texto longo!</p>
     <p v-else>Texto curto!</p>
     <p><input type="password" v-model="senha"/></p>
     <button @click="buscarUsuarios">Atualizar</button>
     <button @click="incluir">Incluir</button>
     <p>{{ erro }}</p>
+
     <table>
       <thead>
         <td>Id</td>
@@ -27,9 +28,12 @@
   import { onMounted, ref } from 'vue';
   import axios from 'axios';
   
-  const nome = ref("Nome");
-  const senha = ref("123");
-  const usuarios = ref();
+  const nome = ref("Debora");
+  const senha = ref("1234");
+  const usuarios = ref([
+    { id: 1, nome: "Lucas", senha: "123" },
+    { id: 2, nome: "Paulo", senha: "456" }
+    ]);
   const erro = ref("");
 
   async function incluir() {

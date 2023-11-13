@@ -3,27 +3,41 @@
     <h1>Gerencie Vocábulos</h1>
     <form @submit.prevent="cadastrarVocabulo">
       <div>
-        <label for="termo">Termo:</label>
-        <input type="text" id="termo" v-model="novoVocabulo.termo" required>
+        <label for="termo">Termo: </label>
+        <input type="text" id="termo" v-model="novoVocabulo.termo">
       </div>
       <div>
-        <label for="significado">Significado:</label>
-        <input type="text" id="significado" v-model="novoVocabulo.significado" required>
+        <label for="significado">Significado: </label>
+        <input type="text" id="significado" v-model="novoVocabulo.significado">
       </div>
       <div>
-        <label for="versao">Versão:</label>
-        <input type="text" id="versao" v-model="novoVocabulo.versao" required>
+        <label for="versao">Versão: </label>
+        <input type="text" id="versao" v-model="novoVocabulo.versao">
       </div>
       <button type="submit">Cadastrar</button>
+      <p v-if="erroCadastro">{{ erroCadastro }}</p>
+      <div>
+        <label for="termoConsulta">Termo para consulta: </label>
+        <input type="text" id="termoConsulta" v-model="termoConsulta">
+      </div>
+      <div>
+        <label for="versaoConsulta">Versão para consulta: </label>
+        <input type="text" id="versaoConsulta" v-model="versaoConsulta">
+      </div>
+      <button @click="consultarVocabulo">Consultar</button>
     </form>
-    <ul>
+    <ul v-if="mostrarLista && vocabulos.length > 0">
       <li v-for="vocabulo in vocabulos" :key="vocabulo.id">
-        <span> ID: {{ vocabulo.id }}</span>
-        <span> Termo: {{ vocabulo.termo }}</span>
-        <span> Significado: {{ vocabulo.significado }}</span>
-        <span> Versão: {{ vocabulo.versao }}</span>
+        <span> ID: {{ vocabulo.id }} -</span>
+        <span> Termo: {{ vocabulo.termo }} -</span>
+        <span> Significado: {{ vocabulo.significado }} -</span>
+        <span> Versão: {{ vocabulo.versao }} </span>
       </li>
     </ul>
+    <p v-else-if="mostrarLista && vocabulos.length === 0 && termoConsulta && versaoConsulta">
+      Nenhum vocábulo foi encontrado para os critérios fornecidos.
+    </p>
+    <p v-else>{{ mensagemConsulta }}</p>
   </div>
 </template>
 
@@ -33,21 +47,58 @@ import axios from 'axios';
 
 const vocabulos = ref([]);
 const novoVocabulo = ref({ termo: '', significado: '', versao: '' });
+const erroCadastro = ref('');
+const termoConsulta = ref('');
+const versaoConsulta = ref('');
+const mostrarLista = ref(true);
+const mensagemConsulta = ref('');
 
 async function atualizar() {
-  vocabulos.value = (await axios.get("https://8080-deborafaria01-test2back-uepe8isfhxz.ws-us106.gitpod.io/vocabulo")).data;
+  try {
+    vocabulos.value = (await axios.get("vocabulo")).data;
+  } catch (ex) {
+    erroCadastro.value = (ex as Error).message;
+  }
 }
 
 async function cadastrarVocabulo() {
-  const response = await axios.post("https://8080-deborafaria01-test2back-uepe8isfhxz.ws-us106.gitpod.io/vocabulo", novoVocabulo.value);
-  if (response.status === 201) {
-    // Se o cadastro foi bem-sucedido, limpe os campos de entrada e atualize a lista de vocábulos
+  try {
+    if (!novoVocabulo.value.termo || !novoVocabulo.value.significado || !novoVocabulo.value.versao) {
+      erroCadastro.value = "Preencha todos os campos antes de cadastrar.";
+      return;
+    }
+
+    await axios.post("vocabulo", {
+      termo: novoVocabulo.value.termo,
+      significado: novoVocabulo.value.significado,
+      versao: novoVocabulo.value.versao
+    });
+
     novoVocabulo.value = { termo: '', significado: '', versao: '' };
-    atualizar();
-  } else {
-    console.error("Erro ao cadastrar o vocábulo.");
+    erroCadastro.value = '';
+
+    await atualizar();
+  } catch (ex) {
+    erroCadastro.value = (ex as Error).message;
   }
 }
+
+async function consultarVocabulo() {
+  try {
+    const response = await axios.get(`vocabulo/${termoConsulta.value}/${versaoConsulta.value}`);
+    vocabulos.value = response.data;
+
+    mostrarLista.value = true;
+    if (vocabulos.value.length === 0 && termoConsulta && versaoConsulta) {
+      mensagemConsulta.value = "Nenhum vocábulo foi encontrado para os critérios fornecidos.";
+    } else {
+      mensagemConsulta.value = '';
+    }
+  } catch (ex) {
+    erroCadastro.value = (ex as Error).message;
+  }
+}
+
 
 onMounted(() => {
   atualizar();

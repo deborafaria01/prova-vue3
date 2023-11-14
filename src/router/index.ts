@@ -21,6 +21,11 @@ const router = createRouter({
       path: '/vocabulos',
       name: 'vocabulos',
       component: () => import('../views/VocabulosView.vue')
+    },
+    {
+      path: '/vocabulos',
+      name: 'vocabulos',
+      component: () => import('../views/VocabulosView.vue')
     }
   
   ]

@@ -8,8 +8,7 @@ import './assets/main.css'
 
 import axios from 'axios';
 
-//axios.defaults.baseURL = 'https://8080-deborafaria01-test2back-uepe8isfhxz.ws-us106.gitpod.io';
-axios.defaults.baseURL = 'https://8080-deborafaria01-backcrud-l2zvn3l2m8w.ws-us106.gitpod.io';
+axios.defaults.baseURL = 'https://8080-deborafaria01-backcrud-exysc9yv63a.ws-us106.gitpod.io';
 
 const app = createApp(App)
 

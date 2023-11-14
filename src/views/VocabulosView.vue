@@ -1,10 +1,10 @@
 <template>
-  <div class="vocabulos">
-    <h1>Gerencie Vocábulos</h1>
-    <form @submit.prevent="cadastrarVocabulo">
+  <div class="empregados">
+    <h1>Gerencie Empregados</h1>
+    <form @submit.prevent="cadastrarEmpregado">
       <div>
-        <label for="termo">Termo: </label>
-        <input type="text" id="termo" v-model="novoVocabulo.termo">
+        <label for="ctps/email">CTPS/Email: </label>
+        <input type="text" id="ctps/email" v-model="novoVocabulo.termo">
       </div>
       <div>
         <label for="significado">Significado: </label>
@@ -14,6 +14,11 @@
         <label for="versao">Versão: </label>
         <input type="text" id="versao" v-model="novoVocabulo.versao">
       </div>
+      <div>
+        <label for="dataHoraCadastro">Data e Hora de Cadastro: </label>
+        <input type="datetime-local" id="dataHoraCadastro" v-model="novoVocabulo.dataHoraCadastro">
+      </div>
+
       <button type="submit">Cadastrar</button>
       <p v-if="erroCadastro">{{ erroCadastro }}</p>
       <div>
@@ -46,7 +51,7 @@ import { onMounted, ref } from 'vue';
 import axios from 'axios';
 
 const vocabulos = ref([]);
-const novoVocabulo = ref({ termo: '', significado: '', versao: '' });
+const novoVocabulo = ref({ termo: '', significado: '', versao: '', dataHoraCadastro: '' });
 const erroCadastro = ref('');
 const termoConsulta = ref('');
 const versaoConsulta = ref('');
@@ -68,13 +73,16 @@ async function cadastrarVocabulo() {
       return;
     }
 
+    const dataHoraAtual = new Date().toISOString().slice(0, 16);
+
     await axios.post("vocabulo", {
       termo: novoVocabulo.value.termo,
       significado: novoVocabulo.value.significado,
-      versao: novoVocabulo.value.versao
+      versao: novoVocabulo.value.versao,
+      dataHoraCadastro: dataHoraAtual
     });
 
-    novoVocabulo.value = { termo: '', significado: '', versao: '' };
+    novoVocabulo.value = { termo: '', significado: '', versao: '', dataHoraCadastro: '' };
     erroCadastro.value = '';
 
     await atualizar();
@@ -82,6 +90,7 @@ async function cadastrarVocabulo() {
     erroCadastro.value = (ex as Error).message;
   }
 }
+
 
 async function consultarVocabulo() {
   try {

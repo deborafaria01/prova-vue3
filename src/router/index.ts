@@ -23,9 +23,9 @@ const router = createRouter({
       component: () => import('../views/VocabulosView.vue')
     },
     {
-      path: '/vocabulos',
-      name: 'vocabulos',
-      component: () => import('../views/VocabulosView.vue')
+      path: '/empregados',
+      name: 'empregados',
+      component: () => import('../views/EmpregadosView.vue')
     }
   
   ]
